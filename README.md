@@ -1,15 +1,18 @@
 # OSINT Recon Tool
 
-A comprehensive Open Source Intelligence (OSINT) reconnaissance tool for gathering information about a target person. Install it as a system-wide command or build standalone binaries.
+A comprehensive Open Source Intelligence (OSINT) tool for gathering information about a target person, domain, email, or phone number.
+
+**Version:** 2.0.0  
+**Inspired by:** Sherlock, theHarvester, SpiderFoot, Recon-ng
 
 ## Features
 
-- **Username Enumeration** - Check 40+ platforms for username presence
-- **Email Intelligence** - Provider detection, MX records, breach checking
-- **Domain Reconnaissance** - WHOIS, DNS records, IP geolocation, SSL certs
-- **Phone Analysis** - Format detection and validation
-- **Name Intelligence** - Name parsing and username variation generation
-- **Full Recon Mode** - Automatic detection and comprehensive scanning
+- **Username Enumeration** - Check 50+ platforms for username presence with false positive detection
+- **Email Intelligence** - Provider detection, MX records, SPF/DMARC, breach checking
+- **Domain Reconnaissance** - WHOIS, DNS records, IP geolocation, SSL certs, port check, subdomains
+- **Phone Analysis** - Format detection, country identification, E.164 normalization
+- **Name Intelligence** - Name parsing, username variation generation, search query suggestions
+- **Full Recon Mode** - Automatic target type detection and comprehensive scanning
 
 ## Installation
 
@@ -21,33 +24,23 @@ cd osint-recon
 pip install .
 ```
 
-This installs `osint-recon` as a system-wide command.
-
-### Option 2: Install in development mode
+### Option 2: Development mode
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-### Option 3: Build a standalone binary
+### Option 3: Build standalone binary
 
 ```bash
 make build
-# Binary will be at: dist/osint-recon
-```
-
-Or manually:
-```bash
-pip install pyinstaller
-pyinstaller --onefile --name osint-recon osint_recon/cli.py
+# Binary: dist/osint-recon
 ```
 
 ## Usage
 
-After installation, use it directly as a command:
-
 ```bash
-# Username enumeration
+# Username enumeration across 50+ platforms
 osint-recon -m username -t johndoe
 
 # Email intelligence
@@ -65,6 +58,12 @@ osint-recon -m name -t "John Doe"
 # Full reconnaissance (auto-detects target type)
 osint-recon -m full -t user@example.com
 osint-recon -m full -t "John Doe" -o results
+
+# With verbose output and rate limiting
+osint-recon -m username -t johndoe -v -r 1.0
+
+# Check for false positives before scanning
+osint-recon -m username -t johndoe --check-fp
 ```
 
 ## Options
@@ -75,11 +74,59 @@ osint-recon -m full -t "John Doe" -o results
 | `-t, --target` | Target to investigate |
 | `-o, --output` | Save results to JSON file (prefix) |
 | `-v, --verbose` | Enable verbose output |
+| `-r, --rate-limit` | Seconds between requests (default: 0.5) |
+| `--check-fp` | Check for false positives before username scan |
 | `--version` | Show version |
 
-## Building Binaries
+## Architecture
 
-Use the Makefile for cross-platform builds:
+The tool follows best practices from established OSINT tools:
+
+- **Data-driven platform definitions** (like Sherlock's data.json)
+- **Rate limiting with jitter** (prevents detection)
+- **User-Agent rotation** (avoids bot detection)
+- **False positive detection** (SpiderFoot-style random probe verification)
+- **Concurrent requests** (ThreadPoolExecutor for speed)
+- **Modular architecture** (easy to add new modules)
+
+### Project Structure
+
+```
+osint-recon/
+├── osint_recon/
+│   ├── __init__.py         # Package metadata
+│   ├── __main__.py         # python -m support
+│   ├── cli.py              # CLI entry point
+│   ├── banner.py           # ASCII art and headers
+│   ├── colors.py           # Terminal colors
+│   ├── http_client.py      # HTTP with rate limiting
+│   ├── platforms.py        # Platform definitions
+│   └── modules/
+│       ├── username.py     # Username enumeration
+│       ├── email.py        # Email intelligence
+│       ├── domain.py       # Domain recon
+│       ├── phone.py        # Phone analysis
+│       └── name.py         # Name intelligence
+├── tests/
+│   └── test_recon.py       # 43 tests
+├── pyproject.toml          # Package config
+├── Makefile                # Build automation
+└── README.md
+```
+
+## Platform Coverage
+
+Username enumeration checks 50+ platforms across categories:
+
+- **Social Media**: Twitter/X, Instagram, Facebook, TikTok, Reddit, YouTube, Telegram, Bluesky, Mastodon
+- **Developer**: GitHub, GitLab, Bitbucket, Dev.to, Medium, Replit, npm, PyPI, Docker Hub
+- **Gaming**: Steam, Twitch, Roblox, Discord, Minecraft
+- **Professional**: LinkedIn, Fiverr, Upwork, Behance, Dribbble
+- **Finance**: Venmo, CashApp
+- **Security**: HackerOne, Bugcrowd, TryHackMe, HackTheBox, RootMe
+- **Other**: Gravatar, Pastebin, Etsy, eBay, SoundCloud
+
+## Building Binaries
 
 ```bash
 make build          # Build for current OS
@@ -89,17 +136,18 @@ make build-windows  # Windows binary (.exe)
 make clean          # Clean build artifacts
 ```
 
-## Platform Coverage
+## Development
 
-The tool checks username presence across 40+ platforms including:
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
 
-- **Social Media**: Twitter/X, Instagram, TikTok, Reddit, YouTube, Facebook, Mastodon, Bluesky
-- **Developer**: GitHub, GitLab, Bitbucket, Dev.to, Medium, Replit, npm, PyPI
-- **Gaming**: Steam, Twitch, Roblox, Discord
-- **Professional**: LinkedIn, Fiverr, Upwork
-- **Finance**: Venmo, CashApp
-- **Security**: HackerOne, Bugcrowd, TryHackMe, HackTheBox
-- **Other**: Telegram, Docker Hub, Pastebin, Gravatar
+# Run tests
+python -m pytest tests/ -v
+
+# Run with Python directly
+python -m osint_recon -m username -t testuser
+```
 
 ## Disclaimer
 
