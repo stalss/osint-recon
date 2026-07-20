@@ -1,16 +1,15 @@
-# OS Logs
-*.log
-*.json
+# Build artifacts
+build/
+dist/
+*.spec
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
-venv/
-.venv/
+.eggs/
+*.egg-info/
 
 # IDE
 .vscode/
@@ -21,6 +20,9 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Pytest
+.pytest_cache/
 
 # Output files
 *_20*.json
