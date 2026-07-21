@@ -501,7 +501,7 @@ def analyze_name(name, verbose=False, email_domains=None, search_all=False):
     if profiles:
         print(f"  {Colors.CYAN}Found profiles on {len(profiles)} platforms:{Colors.ENDC}")
         for platform, urls in list(profiles.items())[:8]:  # Show first 8 platforms
-            print(f"    {Colors.GREEN}{platform}:{Colors.ENDC}")
+            print(f"    {Colors.OKGREEN}{platform}:{Colors.ENDC}")
             for url in urls[:2]:  # Show 2 URLs per platform
                 print(f"      - {url}")
         if len(profiles) > 8:
