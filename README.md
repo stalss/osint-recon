@@ -1,22 +1,44 @@
-# OSINT Recon Tool
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-2.1.0-blue" alt="Version"/>
+  <img src="https://img.shields.io/badge/Python-3.8+-yellow?logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License"/>
+  <img src="https://img.shields.io/badge/Platforms-50+-orange" alt="Platforms"/>
+  <img src="https://img.shields.io/github/stars/stalss/osint-recon?style=social" alt="Stars"/>
+</p>
 
-A comprehensive Open Source Intelligence (OSINT) tool for gathering information about a target person, domain, email, or phone number.
+<h1 align="center">OSINT Recon Tool</h1>
 
-**Version:** 2.1.0  
-**Inspired by:** Sherlock, theHarvester, SpiderFoot, Recon-ng, Maltego
+<p align="center">
+  <strong>Full-spectrum person intelligence.</strong><br/>
+  Find accounts, scrape profiles, discover hobbies, friends, connections — from just a name.
+</p>
 
-## Features
+---
 
-- **Username Enumeration** — Check 50+ platforms for username presence with false positive detection
-- **Email Intelligence** — Provider detection, MX records, SPF/DMARC, breach checking
-- **Domain Reconnaissance** — WHOIS, DNS records, IP geolocation, SSL certs, concurrent port scan, subdomain discovery
-- **Phone Analysis** — Format detection, country identification, E.164 normalization
-- **Name Intelligence** — Real person OSINT: find accounts, scrape profiles, discover hobbies, friends, connections
-- **Full Recon Mode** — Automatic target type detection and comprehensive scanning
+```
+  ███████╗██╗███╗   ███╗██████╗ ██╗██████╗ ███████╗
+  ██╔════╝██║████╗ ████║██╔══██╗██║██╔══██╗██╔════╝
+  ███████╗██║██╔████╔██║██████╔╝██║██████╔╝█████╗  
+  ╚════██║██║██║╚██╔╝██║██╔═══╝ ██║██╔══██╗██╔══╝  
+  ███████║██║██║ ╚═╝ ██║██║     ██║██║  ██║███████╗
+  ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝
+```
 
-## Installation
+<br/>
 
-### Option 1: Install as a command (recommended)
+## What It Does
+
+| Module | What It Finds |
+|--------|---------------|
+| **Name Intel** | Real accounts across 50 platforms, hobbies, skills, work, friends, connections |
+| **Username** | Existence checks on 50+ sites with false positive detection |
+| **Email** | Provider, MX records, breach status, SMTP verification |
+| **Domain** | WHOIS, DNS, SSL, concurrent port scan, subdomains |
+| **Phone** | Format detection, country, carrier, E.164 normalization |
+
+<br/>
+
+## Quick Start
 
 ```bash
 git clone https://github.com/stalss/osint-recon.git
@@ -24,84 +46,38 @@ cd osint-recon
 pip install .
 ```
 
-### Option 2: Development mode
-
-```bash
-pip install -e ".[dev]"
-```
-
-### Option 3: Build standalone binary
-
-```bash
-make build
-# Binary: dist/osint-recon
-```
+<br/>
 
 ## Usage
 
 ```bash
-# Username enumeration across 50+ platforms
+# Deep person scan — find everything from a name
+osint-recon -m name -t "John Doe" --deep -v -o results
+
+# Username enumeration
 osint-recon -m username -t johndoe
 
 # Email intelligence
 osint-recon -m email -t user@example.com
 
-# Domain reconnaissance
+# Domain recon
 osint-recon -m domain -t example.com
 
-# Phone number analysis
+# Phone analysis
 osint-recon -m phone -t +1234567890
 
-# Name intelligence — find accounts, hobbies, connections
-osint-recon -m name -t "John Doe"
-
-# Deep scan — verify emails, search web, discover friends
-osint-recon -m name -t "John Doe" --deep
-
-# Full reconnaissance (auto-detects target type)
-osint-recon -m full -t user@example.com
+# Full auto-detect
 osint-recon -m full -t "John Doe" -o results
-
-# With verbose output and rate limiting
-osint-recon -m username -t johndoe -v -r 1.0
-
-# Check for false positives before scanning
-osint-recon -m username -t johndoe --check-fp
 ```
 
-## Options
+<br/>
 
-| Flag | Description |
-|------|-------------|
-| `-m, --mode` | Recon mode (username/email/domain/phone/name/full) |
-| `-t, --target` | Target to investigate |
-| `-o, --output` | Save results to JSON file (prefix) |
-| `-v, --verbose` | Enable verbose output |
-| `-r, --rate-limit` | Seconds between requests (default: 0.5) |
-| `--check-fp` | Check for false positives before username scan |
-| `--deep` | Deep scan: verify emails, search web, discover connections |
-| `--version` | Show version |
-
-## Name Intelligence — What It Finds
-
-The `--deep` scan on a name like `"Mannat Raj"` will:
+## Deep Scan — What It Finds
 
 ```
-1. Generate ranked username variations (mannatraj, mannat.raj, mraj, etc.)
-2. Check each across 50 platforms (social, dev, gaming, professional)
-3. Scrape found profiles for:
-   - Bio / description
-   - Hobbies & interests (extracted from bio text)
-   - Work & education
-   - Skills & technologies
-   - Connected accounts / friends
-   - Public email addresses
-4. Verify email patterns via SMTP
-5. Search DuckDuckGo for public mentions
-6. Discover connected people from profile pages
+osint-recon -m name -t "Mannat Raj" --deep
 ```
 
-**Example output:**
 ```
 =================================================================
   COMPLETE PERSON PROFILE: Mannat Raj
@@ -119,83 +95,89 @@ The `--deep` scan on a name like `"Mannat Raj"` will:
 =================================================================
 ```
 
+<br/>
+
+## Options
+
+| Flag | Description |
+|------|-------------|
+| `-m, --mode` | `username` `email` `domain` `phone` `name` `full` |
+| `-t, --target` | Target to investigate |
+| `-o, --output` | Save results to JSON (timestamped) |
+| `-v, --verbose` | Verbose output |
+| `-r, --rate-limit` | Seconds between requests (default: 0.5) |
+| `--deep` | Full scan: emails, web search, connections |
+| `--check-fp` | False positive detection before username scan |
+
+<br/>
+
 ## Architecture
 
-The tool follows best practices from established OSINT tools:
-
-- **Data-driven platform definitions** (like Sherlock's data.json)
-- **Rate limiting with jitter** (prevents detection)
-- **User-Agent rotation** (avoids bot detection)
-- **False positive detection** (SpiderFoot-style random probe verification)
-- **Concurrent requests** (ThreadPoolExecutor for speed)
-- **Thread-safe rate limiter** (threading.Lock for concurrent safety)
-- **Modular architecture** (easy to add new modules)
-
-### Project Structure
+- **Data-driven platforms** — add new sites without changing code
+- **Thread-safe rate limiter** — concurrent requests without races
+- **User-Agent rotation** — avoids bot detection
+- **Concurrent scanning** — ports, subdomains, platforms in parallel
+- **Modular design** — each module is independent and testable
 
 ```
 osint-recon/
 ├── osint_recon/
-│   ├── __init__.py         # Package metadata
-│   ├── __main__.py         # python -m support
 │   ├── cli.py              # CLI entry point
-│   ├── banner.py           # ASCII art and headers
-│   ├── colors.py           # Terminal colors
-│   ├── http_client.py      # HTTP with rate limiting (thread-safe)
-│   ├── platforms.py        # Platform definitions
+│   ├── http_client.py      # Thread-safe HTTP with rate limiting
+│   ├── platforms.py        # 50+ platform definitions
 │   └── modules/
+│       ├── name.py         # Deep person OSINT
 │       ├── username.py     # Username enumeration
 │       ├── email.py        # Email intelligence
 │       ├── domain.py       # Domain recon (concurrent)
-│       ├── phone.py        # Phone analysis
-│       └── name.py         # Name intelligence (deep OSINT)
-├── tests/
-│   └── test_recon.py       # 43 tests
-├── pyproject.toml          # Package config
-├── Makefile                # Build automation
-├── LICENSE                 # MIT License
+│       └── phone.py        # Phone analysis
+├── tests/test_recon.py     # 43 tests
+├── pyproject.toml
+├── Makefile
+├── LICENSE
 └── README.md
 ```
 
+<br/>
+
 ## Platform Coverage
 
-Username enumeration checks 50+ platforms across categories:
+| Category | Platforms |
+|----------|-----------|
+| Social | Twitter/X, Instagram, Facebook, TikTok, Reddit, YouTube, Telegram, Bluesky, Mastodon |
+| Developer | GitHub, GitLab, Bitbucket, Dev.to, Medium, Replit, npm, PyPI, Docker Hub |
+| Gaming | Steam, Twitch, Roblox, Discord, Minecraft |
+| Professional | LinkedIn, Fiverr, Upwork, Behance, Dribbble |
+| Security | HackerOne, Bugcrowd, TryHackMe, HackTheBox, RootMe |
 
-- **Social Media**: Twitter/X, Instagram, Facebook, TikTok, Reddit, YouTube, Telegram, Bluesky, Mastodon
-- **Developer**: GitHub, GitLab, Bitbucket, Dev.to, Medium, Replit, npm, PyPI, Docker Hub
-- **Gaming**: Steam, Twitch, Roblox, Discord, Minecraft
-- **Professional**: LinkedIn, Fiverr, Upwork, Behance, Dribbble
-- **Finance**: Venmo, CashApp
-- **Security**: HackerOne, Bugcrowd, TryHackMe, HackTheBox, RootMe
-- **Other**: Gravatar, Pastebin, Etsy, eBay, SoundCloud
-
-## Building Binaries
-
-```bash
-make build          # Build for current OS
-make build-linux    # Linux binary
-make build-macos    # macOS binary
-make build-windows  # Windows binary (.exe)
-make clean          # Clean build artifacts
-```
+<br/>
 
 ## Development
 
 ```bash
-# Install dev dependencies
 pip install -e ".[dev]"
-
-# Run tests
 python -m pytest tests/ -v
-
-# Run with Python directly
-python -m osint_recon -m username -t testuser
 ```
+
+<br/>
+
+## Building
+
+```bash
+make build          # Current OS
+make build-linux    # Linux
+make build-macos    # macOS
+make build-windows  # Windows (.exe)
+```
+
+<br/>
 
 ## Disclaimer
 
-This tool is for educational and authorized security testing purposes only. Always obtain proper authorization before performing reconnaissance on any target. The author is not responsible for any misuse of this tool.
+For educational and authorized security testing only. Obtain proper authorization before scanning any target.
+
+<br/>
 
 ## License
 
-MIT License
+MIT License — see [LICENSE](LICENSE)
