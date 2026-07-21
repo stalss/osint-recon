@@ -164,13 +164,13 @@ def enumerate_username(username, verbose=False, rate_limit=0.5, check_fp=False):
     categories = get_platforms_by_category()
     
     # Optional: Check for false positives first
+    unreliable = set()
     if check_fp:
         print(f"{Status.WARNING} Checking for false positive sites...{Colors.ENDC}")
-        unreliable = []
         with HTTPClient(rate_limit=rate_limit) as client:
             for platform_name, platform_data in PLATFORMS.items():
                 if not check_false_positive(client, platform_data):
-                    unreliable.append(platform_name)
+                    unreliable.add(platform_name)
                     if verbose:
                         print(f"  {Status.WARNING} {platform_name} (unreliable - always returns found){Colors.ENDC}")
         if unreliable:
@@ -179,7 +179,7 @@ def enumerate_username(username, verbose=False, rate_limit=0.5, check_fp=False):
     # Run enumeration with thread pool
     with HTTPClient(rate_limit=rate_limit) as client:
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            # Submit all platform checks
+            # Submit all platform checks, skipping unreliable ones
             future_to_platform = {
                 executor.submit(
                     check_username,
@@ -190,6 +190,7 @@ def enumerate_username(username, verbose=False, rate_limit=0.5, check_fp=False):
                     verbose,
                 ): name
                 for name, data in PLATFORMS.items()
+                if name not in unreliable
             }
             
             # Process results as they complete

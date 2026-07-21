@@ -496,13 +496,6 @@ INDIAN_CARRIERS = {
     "9892": "Airtel", "9893": "Airtel", "9894": "Airtel", "9895": "Airtel",
     "9896": "Airtel", "9897": "Airtel", "9898": "Airtel", "9899": "Airtel",
     # Vi (Vodafone Idea)
-    "7040": "Vi (Vodafone Idea)", "7041": "Vi (Vodafone Idea)", "7042": "Vi (Vodafone Idea)",
-    "7043": "Vi (Vodafone Idea)", "7044": "Vi (Vodafone Idea)", "7045": "Vi (Vodafone Idea)",
-    "7046": "Vi (Vodafone Idea)", "7047": "Vi (Vodafone Idea)", "7048": "Vi (Vodafone Idea)",
-    "7049": "Vi (Vodafone Idea)", "7350": "Vi (Vodafone Idea)", "7351": "Vi (Vodafone Idea)",
-    "7352": "Vi (Vodafone Idea)", "7353": "Vi (Vodafone Idea)", "7354": "Vi (Vodafone Idea)",
-    "7355": "Vi (Vodafone Idea)", "7356": "Vi (Vodafone Idea)", "7357": "Vi (Vodafone Idea)",
-    "7358": "Vi (Vodafone Idea)", "7359": "Vi (Vodafone Idea)",
     "8700": "Vi (Vodafone Idea)", "8701": "Vi (Vodafone Idea)", "8702": "Vi (Vodafone Idea)",
     "8703": "Vi (Vodafone Idea)", "8704": "Vi (Vodafone Idea)", "8705": "Vi (Vodafone Idea)",
     "8706": "Vi (Vodafone Idea)", "8707": "Vi (Vodafone Idea)", "8708": "Vi (Vodafone Idea)",
@@ -653,7 +646,7 @@ INDIAN_CIRCLES = {
     "9822": "Maharashtra", "9823": "Maharashtra", "9860": "Maharashtra",
     "7350": "Maharashtra", "7378": "Maharashtra", "7385": "Maharashtra",
     "7507": "Maharashtra", "7709": "Maharashtra",
-    "9822": "Goa", "9823": "Goa",
+    "9822": "Goa", "9823": "Goa",  # overrides Maharashtra above due to MNP ambiguity
     # Mumbai
     "9820": "Mumbai", "9821": "Mumbai", "9920": "Mumbai",
     "7045": "Mumbai", "7208": "Mumbai", "7710": "Mumbai",

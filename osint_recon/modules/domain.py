@@ -18,6 +18,7 @@ Features:
 
 import socket
 import ssl
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import dns.resolver
 import whois
 import requests
@@ -124,7 +125,7 @@ def get_ip_geolocation(ip):
     """
     try:
         response = requests.get(
-            f"http://ip-api.com/json/{ip}",
+            f"https://ip-api.com/json/{ip}",
             params={"fields": "status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting"},
             timeout=10,
         )
@@ -184,7 +185,7 @@ def get_ssl_certificate(domain):
 
 def check_common_ports(domain):
     """
-    Check common ports for basic service discovery.
+    Check common ports for basic service discovery (concurrent).
     
     Tests ports commonly used by web services.
     This is a lightweight check - not a full port scan.
@@ -215,23 +216,31 @@ def check_common_ports(domain):
     open_ports = {}
     ip = socket.gethostbyname(domain)
     
-    for port, service in common_ports.items():
+    def check_port(port, service):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(2)
             result = sock.connect_ex((ip, port))
-            if result == 0:
-                open_ports[port] = service
             sock.close()
+            if result == 0:
+                return port, service
         except Exception:
             pass
+        return None
+    
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(check_port, p, s): (p, s) for p, s in common_ports.items()}
+        for future in as_completed(futures):
+            result = future.result()
+            if result:
+                open_ports[result[0]] = result[1]
     
     return open_ports
 
 
 def discover_subdomains(domain, verbose=False):
     """
-    Discover subdomains using DNS bruteforce.
+    Discover subdomains using DNS bruteforce (concurrent).
     
     Tests common subdomain prefixes against the target domain.
     This is a basic bruteforce - for comprehensive discovery,
@@ -263,18 +272,25 @@ def discover_subdomains(domain, verbose=False):
     ]
     
     found = {}
-    ip = socket.gethostbyname(domain)
     
-    for sub in subdomains:
+    def check_subdomain(sub):
         full_domain = f"{sub}.{domain}"
         try:
             answers = dns.resolver.resolve(full_domain, 'A')
             ips = [str(r) for r in answers]
-            found[full_domain] = ips
-            if verbose:
-                print(f"    {Status.FOUND} {full_domain} -> {', '.join(ips)}")
+            return full_domain, ips
         except Exception:
-            pass
+            return None
+    
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(check_subdomain, sub): sub for sub in subdomains}
+        for future in as_completed(futures):
+            result = future.result()
+            if result:
+                full_domain, ips = result
+                found[full_domain] = ips
+                if verbose:
+                    print(f"    {Status.FOUND} {full_domain} -> {', '.join(ips)}")
     
     return found
 

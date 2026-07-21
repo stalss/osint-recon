@@ -16,6 +16,7 @@ Key features:
 
 import time
 import random
+import threading
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -68,6 +69,7 @@ class HTTPClient:
         self.timeout = timeout
         self.last_request_time = 0
         self.request_count = 0
+        self._lock = threading.Lock()
         
         # Create a session with connection pooling and retry strategy
         self.session = requests.Session()
@@ -88,13 +90,17 @@ class HTTPClient:
             self.session.proxies = {"http": proxy, "https": proxy}
     
     def _wait_for_rate_limit(self):
-        """Enforce rate limiting between requests."""
+        """Enforce rate limiting between requests (thread-safe)."""
         if self.rate_limit > 0:
-            elapsed = time.time() - self.last_request_time
-            if elapsed < self.rate_limit:
-                # Add jitter to avoid thundering herd problem
-                sleep_time = self.rate_limit - elapsed + random.uniform(0, 0.5)
-                time.sleep(sleep_time)
+            with self._lock:
+                now = time.time()
+                elapsed = now - self.last_request_time
+                if elapsed < self.rate_limit:
+                    sleep_time = self.rate_limit - elapsed + random.uniform(0, 0.5)
+                    self.last_request_time = now + sleep_time
+                    time.sleep(sleep_time)
+                else:
+                    self.last_request_time = now
     
     def _get_headers(self):
         """Generate request headers with random User-Agent."""
@@ -131,8 +137,9 @@ class HTTPClient:
                 allow_redirects=allow_redirects,
                 **kwargs,
             )
-            self.last_request_time = time.time()
-            self.request_count += 1
+            with self._lock:
+                self.last_request_time = time.time()
+                self.request_count += 1
             return response
             
         except requests.exceptions.Timeout:
@@ -159,8 +166,9 @@ class HTTPClient:
                 allow_redirects=False,  # Don't follow redirects for HEAD
                 **kwargs,
             )
-            self.last_request_time = time.time()
-            self.request_count += 1
+            with self._lock:
+                self.last_request_time = time.time()
+                self.request_count += 1
             return response
         except requests.exceptions.RequestException:
             return None

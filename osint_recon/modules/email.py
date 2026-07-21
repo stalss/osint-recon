@@ -351,7 +351,7 @@ def gather_email_intel(email, verbose=False, rate_limit=1.0):
             answers = dns.resolver.resolve(full_domain, 'A')
             ips = [str(r) for r in answers]
             dns_info[full_domain] = ips
-            print(f"    {Status.FOUND} {fulldomain} -> {', '.join(ips)}")
+            print(f"    {Status.FOUND} {full_domain} -> {', '.join(ips)}")
         except Exception:
             pass
     
