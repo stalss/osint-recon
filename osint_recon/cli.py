@@ -162,6 +162,8 @@ Version: {__version__}
                         help='Rate limit in seconds between requests (default: 0.5)')
     parser.add_argument('--check-fp', action='store_true',
                         help='Check for false positives before username enumeration')
+    parser.add_argument('--deep', action='store_true',
+                        help='Deep scan: verify emails, search web, discover connections (slower)')
     parser.add_argument('--version', action='version',
                         version=f'osint-recon {__version__}')
     
@@ -203,7 +205,7 @@ Version: {__version__}
             results['phone_intel'] = analyze_phone(args.target, args.verbose)
             
         elif args.mode == 'name':
-            results['name_intel'] = analyze_name(args.target, args.verbose)
+            results['name_intel'] = analyze_name(args.target, args.verbose, args.rate_limit, args.deep)
             
         elif args.mode == 'full':
             scan_results = run_full_scan(
